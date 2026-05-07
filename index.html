@@ -729,6 +729,34 @@
       .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
       .why-grid { grid-template-columns: 1fr 1fr; }
     }
+    /* ===== ADDRESS AUTOCOMPLETE ===== */
+    .ac-wrap { position: relative; }
+    .ac-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .ac-dropdown li {
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--text);
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .ac-dropdown li:last-child { border-bottom: none; }
+    .ac-dropdown li:hover { background: var(--gray-50); }
   </style>
 </head>
 <body>
@@ -1450,6 +1478,7 @@
     `;
 
     document.getElementById(containerId).innerHTML = html;
+    document.getElementById(containerId).querySelectorAll('input[name="pickup_address"], input[name="delivery_address"]').forEach(attachAddressAutocomplete);
   }
 
   function nextStep(id, current) {
@@ -1523,6 +1552,55 @@
 
   // ===== INIT =====
   renderForm('home-form-container');
+
+  // ===== ADDRESS AUTOCOMPLETE =====
+  function attachAddressAutocomplete(input) {
+    const wrap = document.createElement('div');
+    wrap.className = 'ac-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'ac-dropdown';
+    dropdown.style.display = 'none';
+    wrap.appendChild(dropdown);
+
+    let timer = null;
+
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      const val = this.value.trim();
+      if (val.length < 3) { dropdown.style.display = 'none'; return; }
+      timer = setTimeout(() => fetchSuggestions(val), 300);
+    });
+
+    input.addEventListener('blur', function () {
+      setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+    });
+
+    async function fetchSuggestions(query) {
+      try {
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=us&q=' + encodeURIComponent(query);
+        const res = await fetch(url, { headers: { 'User-Agent': 'WNYShedMovers/1.0' } });
+        const data = await res.json();
+        if (!data.length) { dropdown.style.display = 'none'; return; }
+        dropdown.innerHTML = '';
+        data.forEach(function (item) {
+          const li = document.createElement('li');
+          li.textContent = item.display_name;
+          li.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            input.value = item.display_name;
+            dropdown.style.display = 'none';
+          });
+          dropdown.appendChild(li);
+        });
+        dropdown.style.display = 'block';
+      } catch (e) {
+        dropdown.style.display = 'none';
+      }
+    }
+  }
 </script>
 
 </body>
