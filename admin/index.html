@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WNY Shed Movers — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0b1f3a;
+      --blue: #1a4f8a;
+      --gold: #e8a020;
+      --gold-dark: #c8871a;
+      --white: #ffffff;
+      --gray-50: #f8f9fa;
+      --gray-100: #f0f2f5;
+      --gray-200: #e2e6ea;
+      --gray-300: #ced4da;
+      --gray-500: #adb5bd;
+      --gray-600: #6c757d;
+      --gray-700: #495057;
+      --gray-800: #343a40;
+      --text: #1a1a2e;
+      --sidebar-width: 220px;
+      --header-height: 56px;
+    }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      color: var(--text);
+      background: var(--gray-100);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    h1,h2,h3,h4,h5 { font-family: 'Oswald', sans-serif; font-weight: 600; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--navy);
+      min-height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      padding: 1.25rem 1.25rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-brand h2 {
+      font-size: 1.1rem;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .sidebar-brand h2 span { color: var(--gold); }
+
+    .sidebar-brand small {
+      color: rgba(255,255,255,0.4);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.78rem;
+    }
+
+    .sidebar-nav { padding: 0.75rem 0; flex: 1; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1.25rem;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+    .nav-item.active { background: rgba(26,79,138,0.4); color: var(--white); border-left-color: var(--gold); }
+    .nav-item .nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ===== MAIN ===== */
+    .main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: var(--header-height);
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-size: 1.1rem;
+      color: var(--navy);
+      font-family: 'Oswald', sans-serif;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.82rem; }
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-gold { background: var(--gold); color: var(--navy); }
+    .btn-gold:hover { background: var(--gold-dark); }
+    .btn-ghost { background: transparent; color: var(--gray-700); border: 1.5px solid var(--gray-200); }
+    .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-danger { background: #dc3545; color: var(--white); }
+    .btn-danger:hover { background: #bb2d3b; }
+
+    .content { padding: 1.5rem; flex: 1; }
+
+    /* ===== VIEWS ===== */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ===== METRIC CARDS ===== */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 1.25rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-sub { font-size: 0.82rem; color: var(--gray-600); }
+
+    .metric-card.accent-gold { border-top: 3px solid var(--gold); }
+    .metric-card.accent-blue { border-top: 3px solid var(--blue); }
+    .metric-card.accent-green { border-top: 3px solid #28a745; }
+    .metric-card.accent-navy { border-top: 3px solid var(--navy); }
+
+    /* ===== STATUS BADGE ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-new { background: #e3f2fd; color: #1565c0; }
+    .badge-contacted { background: #fff8e1; color: #e65100; }
+    .badge-quoted { background: #f3e5f5; color: #7b1fa2; }
+    .badge-accepted { background: #e8f5e9; color: #2e7d32; }
+    .badge-scheduled { background: #e0f7fa; color: #00695c; }
+    .badge-enroute { background: #fff3e0; color: #bf360c; }
+    .badge-completed { background: #263238; color: #eceff1; }
+
+    /* ===== DASHBOARD GRID ===== */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header h3 { font-size: 1rem; color: var(--navy); }
+    .card-body { padding: 1.25rem; }
+
+    /* ===== BAR CHART ===== */
+    .bar-chart { display: flex; gap: 0.75rem; align-items: flex-end; height: 140px; padding: 0.5rem 0; }
+
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      background: var(--blue);
+      min-height: 4px;
+      transition: height 0.5s;
+    }
+
+    .bar-label { font-size: 0.72rem; color: var(--gray-600); text-align: center; }
+    .bar-val { font-size: 0.78rem; font-weight: 600; color: var(--navy); }
+
+    /* ===== RECENT JOBS ===== */
+    .recent-job {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background 0.15s;
+      margin: 0 -1.25rem;
+      padding: 0.75rem 1.25rem;
+    }
+
+    .recent-job:last-child { border-bottom: none; }
+    .recent-job:hover { background: var(--gray-50); }
+
+    .recent-job-info { flex: 1; }
+    .recent-job-name { font-weight: 600; font-size: 0.9rem; color: var(--navy); }
+    .recent-job-addr { font-size: 0.8rem; color: var(--gray-600); }
+
+    /* ===== KANBAN ===== */
+    .kanban-board {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+      align-items: flex-start;
+    }
+
+    .kanban-col {
+      min-width: 220px;
+      max-width: 240px;
+      flex-shrink: 0;
+    }
+
+    .kanban-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px 8px 0 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .kanban-count {
+      background: rgba(255,255,255,0.3);
+      padding: 0.1rem 0.45rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+    }
+
+    .kanban-cards { background: var(--gray-100); border-radius: 0 0 8px 8px; min-height: 80px; padding: 0.5rem; }
+
+    .kanban-card {
+      background: var(--white);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--gray-200);
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-1px); }
+
+    .kanban-card-name { font-weight: 600; font-size: 0.88rem; color: var(--navy); margin-bottom: 0.25rem; }
+    .kanban-card-size { font-size: 0.78rem; color: var(--gray-600); margin-bottom: 0.35rem; }
+    .kanban-card-addr { font-size: 0.75rem; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kanban-card-date { font-size: 0.72rem; color: var(--gray-500); margin-top: 0.35rem; }
+
+    /* col colors */
+    .col-new .kanban-header { background: #1565c0; color: #fff; }
+    .col-new .kanban-card { border-left-color: #1565c0; }
+    .col-contacted .kanban-header { background: #e65100; color: #fff; }
+    .col-contacted .kanban-card { border-left-color: #e65100; }
+    .col-quoted .kanban-header { background: #7b1fa2; color: #fff; }
+    .col-quoted .kanban-card { border-left-color: #7b1fa2; }
+    .col-accepted .kanban-header { background: #2e7d32; color: #fff; }
+    .col-accepted .kanban-card { border-left-color: #2e7d32; }
+    .col-scheduled .kanban-header { background: #00695c; color: #fff; }
+    .col-scheduled .kanban-card { border-left-color: #00695c; }
+    .col-enroute .kanban-header { background: #bf360c; color: #fff; }
+    .col-enroute .kanban-card { border-left-color: #bf360c; }
+    .col-completed .kanban-header { background: var(--navy); color: #fff; }
+    .col-completed .kanban-card { border-left-color: var(--navy); }
+
+    /* ===== JOBS TABLE ===== */
+    .table-wrapper { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+    thead th {
+      background: var(--gray-50);
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--gray-700);
+      border-bottom: 1.5px solid var(--gray-200);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    thead th:hover { color: var(--blue); }
+
+    tbody tr {
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: var(--gray-50); }
+
+    tbody td {
+      padding: 0.7rem 0.85rem;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .td-name { font-weight: 600; color: var(--navy); }
+    .td-muted { color: var(--gray-600); font-size: 0.82rem; }
+
+    /* ===== CUSTOMERS ===== */
+    .customers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .customer-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .customer-card:hover { border-color: var(--blue); box-shadow: 0 4px 12px rgba(26,79,138,0.1); }
+
+    .customer-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .customer-name { font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+    .customer-contact { font-size: 0.82rem; color: var(--gray-600); margin-bottom: 0.5rem; }
+    .customer-stats { display: flex; gap: 1rem; }
+    .customer-stat { font-size: 0.8rem; }
+    .customer-stat strong { color: var(--navy); }
+
+    /* ===== JOB DETAIL ===== */
+    #view-detail { display: none; }
+    #view-detail.active { display: block; }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--blue);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.35rem 0;
+    }
+
+    .back-btn:hover { text-decoration: underline; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .detail-section {
+      background: var(--white);
+      border-radius: 10px;
+      border: 1px solid var(--gray-200);
+      margin-bottom: 1rem;
+    }
+
+    .detail-section-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--navy);
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.3px;
+    }
+
+    .detail-section-body { padding: 1.25rem; }
+
+    /* Status pills */
+    .status-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .status-pill {
+      padding: 0.4rem 0.85rem;
+      border-radius: 50px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      opacity: 0.6;
+    }
+
+    .status-pill:hover { opacity: 0.9; }
+    .status-pill.active { opacity: 1; border-color: rgba(0,0,0,0.2); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+
+    .pill-New { background: #e3f2fd; color: #1565c0; }
+    .pill-Contacted { background: #fff8e1; color: #e65100; }
+    .pill-Quoted { background: #f3e5f5; color: #7b1fa2; }
+    .pill-Accepted { background: #e8f5e9; color: #2e7d32; }
+    .pill-Scheduled { background: #e0f7fa; color: #00695c; }
+    .pill-Enroute { background: #fff3e0; color: #bf360c; }
+    .pill-Completed { background: #263238; color: #eceff1; }
+
+    /* form fields in detail */
+    .field-group { margin-bottom: 1rem; }
+    .field-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      margin-bottom: 0.3rem;
+    }
+
+    .field-input, .field-select, .field-textarea {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      border-color: var(--blue);
+    }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    /* map */
+    #route-map { height: 240px; border-radius: 8px; background: var(--gray-100); }
+
+    .map-summary {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: var(--gray-50);
+      border-radius: 6px;
+    }
+
+    .map-stat { text-align: center; flex: 1; }
+    .map-stat strong { font-family: 'Oswald', sans-serif; font-size: 1.1rem; color: var(--navy); display: block; }
+    .map-stat small { font-size: 0.78rem; color: var(--gray-600); }
+
+    /* notes */
+    .note-item {
+      padding: 0.85rem;
+      background: var(--gray-50);
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      border-left: 3px solid var(--blue);
+    }
+
+    .note-meta {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-bottom: 0.35rem;
+    }
+
+    .note-text { font-size: 0.9rem; }
+
+    .note-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .note-input-row textarea {
+      flex: 1;
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.9rem;
+      resize: none;
+      outline: none;
+    }
+
+    .note-input-row textarea:focus { border-color: var(--blue); }
+
+    .detail-actions {
+      display: flex;
+      gap: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--gray-200);
+      margin-top: 0.5rem;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--gray-600);
+    }
+
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .empty-state h3 { color: var(--navy); margin-bottom: 0.5rem; }
+
+    /* ===== LOADING ===== */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid var(--gray-200);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 3rem;
+      color: var(--gray-600);
+    }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      background: var(--navy);
+      color: var(--white);
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.success { background: #1b5e20; }
+    .toast.error { background: #b71c1c; }
+
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ===== SEARCH / FILTER ===== */
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.5rem 0.85rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-input:focus { border-color: var(--blue); }
+
+    .filter-select {
+      padding: 0.5rem 0.75rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.85rem;
+      background: var(--white);
+      outline: none;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .modal h3 { color: var(--navy); margin-bottom: 0.75rem; }
+    .modal p { color: var(--gray-600); font-size: 0.95rem; margin-bottom: 1.25rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>WNY <span>Shed</span> Movers</h2>
+    <small>Admin Panel</small>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showView('dashboard')" data-view="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showView('kanban')" data-view="kanban">
+      <span class="nav-icon">📋</span> Job Board
+    </div>
+    <div class="nav-item" onclick="showView('jobs')" data-view="jobs">
+      <span class="nav-icon">📄</span> Jobs List
+    </div>
+    <div class="nav-item" onclick="showView('customers')" data-view="customers">
+      <span class="nav-icon">👥</span> Customers
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="../" style="color:rgba(255,255,255,0.35); font-size:0.78rem;">← Public Site</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">Dashboard</span>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="refreshData()">↻ Refresh</button>
+      <button class="btn btn-gold" onclick="showNewJobModal()">+ New Job</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard" class="view active">
+      <div class="metrics-grid" id="metrics-grid">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header"><h3>Jobs by Status</h3></div>
+          <div class="card-body">
+            <div class="bar-chart" id="bar-chart"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Recent Jobs</h3></div>
+          <div class="card-body" id="recent-jobs-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANBAN -->
+    <div id="view-kanban" class="view">
+      <div class="kanban-board" id="kanban-board">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- JOBS LIST -->
+    <div id="view-jobs" class="view">
+      <div class="toolbar">
+        <input class="search-input" id="jobs-search" placeholder="Search by name, address, phone…" oninput="filterJobs()">
+        <select class="filter-select" id="jobs-status-filter" onchange="filterJobs()">
+          <option value="">All Statuses</option>
+          <option>New</option>
+          <option>Contacted</option>
+          <option>Quoted</option>
+          <option>Accepted</option>
+          <option>Scheduled</option>
+          <option>Enroute</option>
+          <option>Completed</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrapper">
+          <table id="jobs-table">
+            <thead>
+              <tr>
+                <th onclick="sortJobs('customer_name')">Customer</th>
+                <th onclick="sortJobs('status')">Status</th>
+                <th onclick="sortJobs('shed_size')">Shed</th>
+                <th>Pickup</th>
+                <th onclick="sortJobs('scheduled_date')">Date</th>
+                <th onclick="sortJobs('quote_amount')">Quote</th>
+                <th onclick="sortJobs('created_at')">Created</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div id="view-customers" class="view">
+      <div class="toolbar">
+        <input class="search-input" id="customers-search" placeholder="Search customers…" oninput="filterCustomers()">
+      </div>
+      <div class="customers-grid" id="customers-grid"></div>
+    </div>
+
+    <!-- JOB DETAIL -->
+    <div id="view-detail" class="view">
+      <div class="detail-header">
+        <span class="back-btn" id="back-btn">← Back</span>
+        <h2 id="detail-job-title" style="color:var(--navy); font-size:1.3rem;"></h2>
+      </div>
+      <div class="detail-grid">
+        <!-- Left col -->
+        <div>
+          <!-- Status -->
+          <div class="detail-section">
+            <div class="detail-section-header">Status</div>
+            <div class="detail-section-body">
+              <div class="status-pills" id="status-pills"></div>
+            </div>
+          </div>
+
+          <!-- Customer Info -->
+          <div class="detail-section">
+            <div class="detail-section-header">Customer Information</div>
+            <div class="detail-section-body">
+              <div class="field-row">
+                <div class="field-group">
+                  <div class="field-label">Full Name</div>
+                  <input class="field-input" id="f-name" type="text">
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Phone</div>
+                  <input class="field-input" id="f-phone" type="tel">
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Email</div>
+                <input class="field-input" id="f-email" type="email">
+              </div>
+            </div>
+          </div>
+
+          <!-- Job Details -->
+          <div class="detail-section">
+            <div class="detail-section-header">Job Details</div>
+            <div class="detail-section-body">
+              <div class="field-row">
+                <div class="field-group">
+                  <div class="field-label">Shed Size</div>
+                  <select class="field-select" id="f-size">
+                    <option>6x8</option><option>8x10</option><option>10x12</option>
+                    <option>10x14</option><option>12x16</option><option>12x20</option>
+                    <option>14x20</option><option>16x20</option><option>Larger / Custom</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Shed Type</div>
+                  <select class="field-select" id="f-type">
+                    <option>Wood</option><option>Vinyl</option><option>Metal</option>
+                    <option>Resin / Plastic</option><option>Not Sure</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <div class="field-label">Quote Amount ($)</div>
+                  <input class="field-input" id="f-quote" type="number" min="0" step="0.01">
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Scheduled Date</div>
+                  <input class="field-input" id="f-date" type="date">
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field-label">Assigned Driver</div>
+                <input class="field-input" id="f-driver" type="text" placeholder="Driver name">
+              </div>
+            </div>
+          </div>
+
+          <!-- Addresses -->
+          <div class="detail-section">
+            <div class="detail-section-header">Addresses</div>
+            <div class="detail-section-body">
+              <div class="field-group">
+                <div class="field-label">Pickup Address</div>
+                <input class="field-input" id="f-pickup" type="text" onchange="updateMap()">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Delivery Address</div>
+                <input class="field-input" id="f-delivery" type="text" onchange="updateMap()">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Special Instructions</div>
+                <textarea class="field-textarea" id="f-instructions" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="saveJob()">💾 Save Changes</button>
+            <button class="btn btn-ghost" id="maps-btn" onclick="openGoogleMaps()">🗺️ Open in Google Maps</button>
+            <button class="btn btn-danger" onclick="confirmDelete()" style="margin-left:auto;">🗑️ Delete Job</button>
+          </div>
+        </div>
+
+        <!-- Right col -->
+        <div>
+          <!-- Route Map -->
+          <div class="detail-section">
+            <div class="detail-section-header">Route Map</div>
+            <div class="detail-section-body">
+              <div id="route-map"></div>
+              <div class="map-summary" id="map-summary" style="display:none;">
+                <div class="map-stat">
+                  <strong id="map-distance">—</strong>
+                  <small>Distance</small>
+                </div>
+                <div class="map-stat">
+                  <strong id="map-duration">—</strong>
+                  <small>Drive Time</small>
+                </div>
+              </div>
+              <p id="map-status" style="font-size:0.8rem; color:var(--gray-600); margin-top:0.5rem; text-align:center;"></p>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="detail-section">
+            <div class="detail-section-header">Notes</div>
+            <div class="detail-section-body">
+              <div id="notes-list"></div>
+              <div class="note-input-row">
+                <textarea id="new-note-input" rows="2" placeholder="Add a note…"></textarea>
+                <button class="btn btn-primary btn-sm" style="align-self:flex-end;" onclick="addNote()">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</main>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <h3>Delete Job</h3>
+    <p>Are you sure you want to delete this job? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="deleteJob()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const SUPABASE_URL = 'https://mkcuvwcfjdzqlaclyjwr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rY3V2d2NmamR6cWxhY2x5andyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMTU3NTQsImV4cCI6MjA5MzY5MTc1NH0.HEv2zNNqGE75dfqasbS7oLkLH0euNb986tXw_2avXIw';
+const STATUSES = ['New','Contacted','Quoted','Accepted','Scheduled','Enroute','Completed'];
+
+// ===== STATE =====
+let allJobs = [];
+let currentJob = null;
+let currentView = 'dashboard';
+let prevView = 'dashboard';
+let sortKey = 'created_at';
+let sortDir = -1;
+let map = null;
+let mapInitialized = false;
+
+// ===== API =====
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+async function fetchJobs() {
+  return apiFetch('jobs?order=created_at.desc&select=*');
+}
+
+async function updateJobApi(id, data) {
+  return apiFetch(`jobs?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify(data)
+  });
+}
+
+async function createJobApi(data) {
+  return apiFetch('jobs', {
+    method: 'POST',
+    headers: { 'Prefer': 'return=representation' },
+    body: JSON.stringify(data)
+  });
+}
+
+async function deleteJobApi(id) {
+  return apiFetch(`jobs?id=eq.${id}`, { method: 'DELETE' });
+}
+
+// ===== DATA =====
+async function refreshData() {
+  try {
+    allJobs = await fetchJobs();
+    renderCurrentView();
+    toast('Data refreshed', 'success');
+  } catch (e) {
+    toast('Failed to load data: ' + e.message, 'error');
+  }
+}
+
+// ===== VIEWS =====
+function showView(name) {
+  if (name !== 'detail') prevView = name;
+  currentView = name;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('[data-view]').forEach(n => n.classList.remove('active'));
+
+  const viewEl = document.getElementById('view-' + name);
+  if (viewEl) viewEl.classList.add('active');
+
+  const navEl = document.querySelector(`[data-view="${name}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  const titles = { dashboard: 'Dashboard', kanban: 'Job Board', jobs: 'Jobs List', customers: 'Customers', detail: 'Job Detail' };
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  switch (currentView) {
+    case 'dashboard': renderDashboard(); break;
+    case 'kanban': renderKanban(); break;
+    case 'jobs': renderJobsTable(); break;
+    case 'customers': renderCustomers(); break;
+  }
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  if (!allJobs.length) return;
+
+  const total = allJobs.length;
+  const newJobs = allJobs.filter(j => j.status === 'New').length;
+  const thisWeek = allJobs.filter(j => {
+    if (!j.scheduled_date) return false;
+    const d = new Date(j.scheduled_date);
+    const now = new Date();
+    const start = new Date(now.setDate(now.getDate() - now.getDay()));
+    const end = new Date(start); end.setDate(end.getDate() + 7);
+    return d >= start && d <= end;
+  }).length;
+  const completed = allJobs.filter(j => j.status === 'Completed').length;
+  const revenue = allJobs.filter(j => j.status === 'Completed' && j.quote_amount)
+    .reduce((s, j) => s + parseFloat(j.quote_amount), 0);
+
+  document.getElementById('metrics-grid').innerHTML = `
+    <div class="metric-card accent-gold">
+      <div class="metric-label">Total Jobs</div>
+      <div class="metric-value">${total}</div>
+      <div class="metric-sub">All time</div>
+    </div>
+    <div class="metric-card accent-blue">
+      <div class="metric-label">New (Uncontacted)</div>
+      <div class="metric-value">${newJobs}</div>
+      <div class="metric-sub">Needs follow-up</div>
+    </div>
+    <div class="metric-card accent-green">
+      <div class="metric-label">Scheduled This Week</div>
+      <div class="metric-value">${thisWeek}</div>
+      <div class="metric-sub">Active jobs</div>
+    </div>
+    <div class="metric-card accent-navy">
+      <div class="metric-label">Completed</div>
+      <div class="metric-value">${completed}</div>
+      <div class="metric-sub">Revenue: $${revenue.toFixed(0)}</div>
+    </div>
+  `;
+
+  // Bar chart
+  const counts = {};
+  STATUSES.forEach(s => counts[s] = 0);
+  allJobs.forEach(j => { if (counts[j.status] !== undefined) counts[j.status]++; });
+  const max = Math.max(...Object.values(counts), 1);
+
+  document.getElementById('bar-chart').innerHTML = STATUSES.map(s => `
+    <div class="bar-col">
+      <div class="bar-val">${counts[s]}</div>
+      <div class="bar" style="height:${Math.max((counts[s]/max)*110, 4)}px;"></div>
+      <div class="bar-label">${s}</div>
+    </div>
+  `).join('');
+
+  // Recent jobs
+  const recent = [...allJobs].slice(0, 8);
+  document.getElementById('recent-jobs-list').innerHTML = recent.map(j => `
+    <div class="recent-job" onclick="openJob('${j.id}')">
+      <div class="recent-job-info">
+        <div class="recent-job-name">${esc(j.customer_name || '—')}</div>
+        <div class="recent-job-addr">${esc(j.pickup_address || '')} ${j.shed_size ? '· ' + j.shed_size : ''}</div>
+      </div>
+      <span class="badge badge-${(j.status||'new').toLowerCase()}">${j.status}</span>
+    </div>
+  `).join('') || '<p style="color:var(--gray-600); font-size:0.9rem;">No jobs yet.</p>';
+}
+
+// ===== KANBAN =====
+function renderKanban() {
+  const cols = STATUSES.map(status => {
+    const cards = allJobs.filter(j => j.status === status);
+    return `
+      <div class="kanban-col col-${status.toLowerCase()}">
+        <div class="kanban-header">
+          ${status}
+          <span class="kanban-count">${cards.length}</span>
+        </div>
+        <div class="kanban-cards">
+          ${cards.map(j => `
+            <div class="kanban-card" onclick="openJob('${j.id}')">
+              <div class="kanban-card-name">${esc(j.customer_name || '—')}</div>
+              <div class="kanban-card-size">${j.shed_size || ''} ${j.shed_type ? '· ' + j.shed_type : ''}</div>
+              <div class="kanban-card-addr">${esc(j.pickup_address || '')}</div>
+              ${j.scheduled_date ? `<div class="kanban-card-date">📅 ${formatDate(j.scheduled_date)}</div>` : ''}
+              ${j.quote_amount ? `<div class="kanban-card-date">💲 $${parseFloat(j.quote_amount).toFixed(0)}</div>` : ''}
+            </div>
+          `).join('')}
+          ${cards.length === 0 ? '<div style="padding:0.75rem; text-align:center; color:var(--gray-500); font-size:0.82rem;">No jobs</div>' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('kanban-board').innerHTML = cols;
+}
+
+// ===== JOBS TABLE =====
+let filteredJobs = [];
+
+function renderJobsTable() {
+  filteredJobs = [...allJobs];
+  applyJobFilters();
+}
+
+function filterJobs() { applyJobFilters(); }
+
+function applyJobFilters() {
+  const search = (document.getElementById('jobs-search')?.value || '').toLowerCase();
+  const status = document.getElementById('jobs-status-filter')?.value || '';
+
+  filteredJobs = allJobs.filter(j => {
+    const matchStatus = !status || j.status === status;
+    const matchSearch = !search || [j.customer_name, j.customer_phone, j.customer_email, j.pickup_address, j.delivery_address].some(v => v && v.toLowerCase().includes(search));
+    return matchStatus && matchSearch;
+  });
+
+  filteredJobs.sort((a, b) => {
+    const av = a[sortKey] || '';
+    const bv = b[sortKey] || '';
+    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+  });
+
+  const tbody = document.getElementById('jobs-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = filteredJobs.map(j => `
+    <tr onclick="openJob('${j.id}')">
+      <td>
+        <div class="td-name">${esc(j.customer_name || '—')}</div>
+        <div class="td-muted">${esc(j.customer_phone || '')}</div>
+      </td>
+      <td><span class="badge badge-${(j.status||'new').toLowerCase()}">${j.status || '—'}</span></td>
+      <td>${j.shed_size || '—'} <span class="td-muted">${j.shed_type || ''}</span></td>
+      <td class="td-muted" style="max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(j.pickup_address || '—')}</td>
+      <td>${j.scheduled_date ? formatDate(j.scheduled_date) : '—'}</td>
+      <td>${j.quote_amount ? '$' + parseFloat(j.quote_amount).toFixed(0) : '—'}</td>
+      <td class="td-muted">${formatDateTime(j.created_at)}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--gray-600);">No jobs found.</td></tr>`;
+}
+
+function sortJobs(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  applyJobFilters();
+}
+
+// ===== CUSTOMERS =====
+function renderCustomers() {
+  const search = (document.getElementById('customers-search')?.value || '').toLowerCase();
+  const map = {};
+  allJobs.forEach(j => {
+    const key = (j.customer_email || j.customer_phone || j.customer_name || '').toLowerCase();
+    if (!key) return;
+    if (!map[key]) map[key] = { name: j.customer_name, email: j.customer_email, phone: j.customer_phone, jobs: [] };
+    map[key].jobs.push(j);
+  });
+
+  let customers = Object.values(map);
+  if (search) customers = customers.filter(c => [c.name, c.email, c.phone].some(v => v && v.toLowerCase().includes(search)));
+  customers.sort((a, b) => b.jobs.length - a.jobs.length);
+
+  const grid = document.getElementById('customers-grid');
+  if (!grid) return;
+
+  grid.innerHTML = customers.map(c => {
+    const revenue = c.jobs.filter(j => j.status === 'Completed' && j.quote_amount).reduce((s, j) => s + parseFloat(j.quote_amount), 0);
+    const initials = (c.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return `
+      <div class="customer-card">
+        <div class="customer-avatar">${initials}</div>
+        <div class="customer-name">${esc(c.name || '—')}</div>
+        <div class="customer-contact">${c.phone ? '📞 ' + esc(c.phone) : ''} ${c.email ? '· ' + esc(c.email) : ''}</div>
+        <div class="customer-stats">
+          <div class="customer-stat"><strong>${c.jobs.length}</strong><br>Jobs</div>
+          ${revenue > 0 ? `<div class="customer-stat"><strong>$${revenue.toFixed(0)}</strong><br>Revenue</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('') || '<div class="empty-state"><div class="empty-icon">👥</div><h3>No customers yet</h3></div>';
+}
+
+function filterCustomers() { renderCustomers(); }
+
+// ===== JOB DETAIL =====
+function openJob(id) {
+  currentJob = allJobs.find(j => j.id === id);
+  if (!currentJob) return;
+
+  document.getElementById('back-btn').onclick = () => showView(prevView);
+  document.getElementById('detail-job-title').textContent = currentJob.customer_name || 'Job Detail';
+
+  // Status pills
+  document.getElementById('status-pills').innerHTML = STATUSES.map(s => `
+    <span class="status-pill pill-${s} ${currentJob.status === s ? 'active' : ''}" onclick="setStatus('${s}')">${s}</span>
+  `).join('');
+
+  // Fields
+  document.getElementById('f-name').value = currentJob.customer_name || '';
+  document.getElementById('f-phone').value = currentJob.customer_phone || '';
+  document.getElementById('f-email').value = currentJob.customer_email || '';
+  document.getElementById('f-size').value = currentJob.shed_size || '';
+  document.getElementById('f-type').value = currentJob.shed_type || '';
+  document.getElementById('f-quote').value = currentJob.quote_amount || '';
+  document.getElementById('f-date').value = currentJob.scheduled_date || '';
+  document.getElementById('f-driver').value = currentJob.assigned_driver || '';
+  document.getElementById('f-pickup').value = currentJob.pickup_address || '';
+  document.getElementById('f-delivery').value = currentJob.delivery_address || '';
+  document.getElementById('f-instructions').value = currentJob.special_instructions || '';
+
+  renderNotes();
+  showView('detail');
+
+  setTimeout(() => {
+    initMap();
+    if (currentJob.pickup_address && currentJob.delivery_address) updateMap();
+  }, 200);
+}
+
+function setStatus(status) {
+  if (!currentJob) return;
+  currentJob.status = status;
+  document.querySelectorAll('.status-pill').forEach(p => {
+    p.classList.toggle('active', p.textContent === status);
+  });
+}
+
+async function saveJob() {
+  if (!currentJob) return;
+  const data = {
+    customer_name: document.getElementById('f-name').value,
+    customer_phone: document.getElementById('f-phone').value,
+    customer_email: document.getElementById('f-email').value,
+    shed_size: document.getElementById('f-size').value,
+    shed_type: document.getElementById('f-type').value,
+    quote_amount: document.getElementById('f-quote').value || null,
+    scheduled_date: document.getElementById('f-date').value || null,
+    assigned_driver: document.getElementById('f-driver').value,
+    pickup_address: document.getElementById('f-pickup').value,
+    delivery_address: document.getElementById('f-delivery').value,
+    special_instructions: document.getElementById('f-instructions').value,
+    status: currentJob.status,
+    notes: currentJob.notes
+  };
+
+  try {
+    await updateJobApi(currentJob.id, data);
+    Object.assign(currentJob, data);
+    const idx = allJobs.findIndex(j => j.id === currentJob.id);
+    if (idx !== -1) allJobs[idx] = { ...allJobs[idx], ...data };
+    document.getElementById('detail-job-title').textContent = data.customer_name || 'Job Detail';
+    toast('Job saved!', 'success');
+  } catch (e) {
+    toast('Save failed: ' + e.message, 'error');
+  }
+}
+
+function confirmDelete() {
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.remove('open');
+}
+
+async function deleteJob() {
+  if (!currentJob) return;
+  try {
+    await deleteJobApi(currentJob.id);
+    allJobs = allJobs.filter(j => j.id !== currentJob.id);
+    closeDeleteModal();
+    toast('Job deleted', 'success');
+    showView(prevView);
+  } catch (e) {
+    toast('Delete failed: ' + e.message, 'error');
+  }
+}
+
+// ===== NOTES =====
+function renderNotes() {
+  const notes = Array.isArray(currentJob?.notes) ? currentJob.notes : [];
+  document.getElementById('notes-list').innerHTML = notes.length
+    ? notes.map(n => `
+        <div class="note-item">
+          <div class="note-meta">${n.author || 'Admin'} · ${n.timestamp ? new Date(n.timestamp).toLocaleString() : ''}</div>
+          <div class="note-text">${esc(n.text)}</div>
+        </div>
+      `).join('')
+    : '<p style="color:var(--gray-500); font-size:0.85rem; margin-bottom:0.75rem;">No notes yet.</p>';
+}
+
+async function addNote() {
+  const input = document.getElementById('new-note-input');
+  const text = input.value.trim();
+  if (!text || !currentJob) return;
+
+  const note = { text, timestamp: new Date().toISOString(), author: 'Admin' };
+  const notes = Array.isArray(currentJob.notes) ? [...currentJob.notes, note] : [note];
+
+  try {
+    await updateJobApi(currentJob.id, { notes });
+    currentJob.notes = notes;
+    const idx = allJobs.findIndex(j => j.id === currentJob.id);
+    if (idx !== -1) allJobs[idx].notes = notes;
+    input.value = '';
+    renderNotes();
+  } catch (e) {
+    toast('Failed to add note: ' + e.message, 'error');
+  }
+}
+
+// ===== MAP =====
+function initMap() {
+  if (mapInitialized) return;
+  map = L.map('route-map').setView([43.0, -78.5], 9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  mapInitialized = true;
+}
+
+let mapMarkers = [];
+let mapRoute = null;
+
+async function geocode(address) {
+  const q = encodeURIComponent(address + ', New York, USA');
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`);
+  const data = await res.json();
+  if (!data.length) throw new Error('Address not found');
+  return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+}
+
+async function updateMap() {
+  const pickup = document.getElementById('f-pickup')?.value;
+  const delivery = document.getElementById('f-delivery')?.value;
+  if (!pickup || !delivery || !map) return;
+
+  document.getElementById('map-status').textContent = 'Loading route…';
+  document.getElementById('map-summary').style.display = 'none';
+
+  mapMarkers.forEach(m => m.remove());
+  mapMarkers = [];
+  if (mapRoute) { mapRoute.remove(); mapRoute = null; }
+
+  try {
+    const [pCoord, dCoord] = await Promise.all([geocode(pickup), geocode(delivery)]);
+
+    const greenIcon = L.divIcon({ html: '<div style="background:#2e7d32;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div>', iconSize:[14,14], iconAnchor:[7,7] });
+    const redIcon = L.divIcon({ html: '<div style="background:#c62828;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div>', iconSize:[14,14], iconAnchor:[7,7] });
+
+    const pm = L.marker(pCoord, { icon: greenIcon }).addTo(map).bindPopup('Pickup: ' + pickup);
+    const dm = L.marker(dCoord, { icon: redIcon }).addTo(map).bindPopup('Delivery: ' + delivery);
+    mapMarkers = [pm, dm];
+
+    map.fitBounds([pCoord, dCoord], { padding: [40, 40] });
+
+    const routeRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${pCoord[1]},${pCoord[0]};${dCoord[1]},${dCoord[0]}?overview=full&geometries=geojson`);
+    const routeData = await routeRes.json();
+
+    if (routeData.code === 'Ok') {
+      const route = routeData.routes[0];
+      mapRoute = L.geoJSON(route.geometry, { style: { color: '#1a4f8a', weight: 4, opacity: 0.8 } }).addTo(map);
+
+      const miles = (route.distance * 0.000621371).toFixed(1);
+      const mins = Math.round(route.duration / 60);
+      const hrs = Math.floor(mins / 60);
+      const remMins = mins % 60;
+      const durationStr = hrs > 0 ? `${hrs}h ${remMins}m` : `${mins}m`;
+
+      document.getElementById('map-distance').textContent = miles + ' mi';
+      document.getElementById('map-duration').textContent = durationStr;
+      document.getElementById('map-summary').style.display = 'flex';
+      document.getElementById('map-status').textContent = '';
+    } else {
+      document.getElementById('map-status').textContent = 'Route not available.';
+    }
+  } catch (e) {
+    document.getElementById('map-status').textContent = 'Could not load route: ' + e.message;
+  }
+}
+
+function openGoogleMaps() {
+  const pickup = document.getElementById('f-pickup')?.value;
+  const delivery = document.getElementById('f-delivery')?.value;
+  if (!pickup || !delivery) return;
+  const url = `https://www.google.com/maps/dir/${encodeURIComponent(pickup)}/${encodeURIComponent(delivery)}`;
+  window.open(url, '_blank');
+}
+
+// ===== NEW JOB MODAL =====
+function showNewJobModal() {
+  const name = prompt('Customer name:');
+  if (!name) return;
+  const phone = prompt('Phone number:');
+  createNewJob({ customer_name: name, customer_phone: phone || '', status: 'New' });
+}
+
+async function createNewJob(data) {
+  try {
+    const result = await createJobApi(data);
+    const job = Array.isArray(result) ? result[0] : result;
+    if (job) {
+      allJobs.unshift(job);
+      toast('Job created!', 'success');
+      openJob(job.id);
+    }
+  } catch (e) {
+    toast('Failed to create job: ' + e.message, 'error');
+  }
+}
+
+// ===== TOAST =====
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ===== UTILS =====
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const date = new Date(d + 'T12:00:00');
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatDateTime(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ===== INIT =====
+(async () => {
+  try {
+    allJobs = await fetchJobs();
+  } catch (e) {
+    toast('Could not connect to database: ' + e.message, 'error');
+    allJobs = [];
+  }
+  renderDashboard();
+})();
+</script>
+</body>
+</html>
