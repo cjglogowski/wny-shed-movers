@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls '/Volumes/SSD Storage/github/wnyshedmovers' 2>/dev/null && echo \"EXISTS\" || echo \"NOT FOUND\")",
+      "Bash(rsync -av /Users/christopher/wny-shed-movers/ '/Volumes/SSD Storage/github/wnyshedmovers/wny-shed-movers/')"
+    ]
+  }
+}
