@@ -1580,7 +1580,7 @@
 
     async function fetchSuggestions(query) {
       try {
-        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=us&state=New+York&addressdetails=1&q=' + encodeURIComponent(query);
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=us&addressdetails=1&q=' + encodeURIComponent(query);
         const res = await fetch(url, { headers: { 'User-Agent': 'WNYShedMovers/1.0' } });
         const data = await res.json();
         const results = data.filter(function (item) {
