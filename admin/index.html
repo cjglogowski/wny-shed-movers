@@ -1577,17 +1577,25 @@ function formatDateTime(d) {
 
     async function fetchSuggestions(query) {
       try {
-        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=us&q=' + encodeURIComponent(query);
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=us&state=New+York&addressdetails=1&q=' + encodeURIComponent(query);
         const res = await fetch(url, { headers: { 'User-Agent': 'WNYShedMovers/1.0' } });
         const data = await res.json();
-        if (!data.length) { dropdown.style.display = 'none'; return; }
+        const results = data.filter(function (item) {
+          const a = item.address || {};
+          return a.state === 'New York' && a.house_number;
+        }).map(function (item) {
+          const a = item.address;
+          const city = a.city || a.town || a.village || a.hamlet || '';
+          return a.house_number + ' ' + (a.road || '') + ', ' + city + ', NY ' + (a.postcode || '');
+        });
+        if (!results.length) { dropdown.style.display = 'none'; return; }
         dropdown.innerHTML = '';
-        data.forEach(function (item) {
+        results.forEach(function (label) {
           const li = document.createElement('li');
-          li.textContent = item.display_name;
+          li.textContent = label;
           li.addEventListener('mousedown', function (e) {
             e.preventDefault();
-            input.value = item.display_name;
+            input.value = label;
             dropdown.style.display = 'none';
           });
           dropdown.appendChild(li);
