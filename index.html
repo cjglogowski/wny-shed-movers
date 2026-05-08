@@ -1479,6 +1479,7 @@
 
     document.getElementById(containerId).innerHTML = html;
     document.getElementById(containerId).querySelectorAll('input[name="pickup_address"], input[name="delivery_address"]').forEach(attachAddressAutocomplete);
+    document.getElementById(containerId).querySelectorAll('input[name="customer_phone"]').forEach(attachPhoneFormat);
   }
 
   function nextStep(id, current) {
@@ -1552,6 +1553,25 @@
 
   // ===== INIT =====
   renderForm('home-form-container');
+
+  // ===== PHONE FORMATTING =====
+  function formatPhone(val) {
+    const d = String(val).replace(/\D/g, '').slice(0, 10);
+    if (d.length === 0) return '';
+    if (d.length <= 3) return '(' + d;
+    if (d.length <= 6) return '(' + d.slice(0, 3) + ') ' + d.slice(3);
+    return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+  }
+
+  function attachPhoneFormat(input) {
+    input.addEventListener('input', function () {
+      const start = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = formatPhone(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(start + diff, start + diff);
+    });
+  }
 
   // ===== ADDRESS AUTOCOMPLETE =====
   function attachAddressAutocomplete(input) {

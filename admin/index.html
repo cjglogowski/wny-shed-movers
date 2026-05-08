@@ -1303,7 +1303,7 @@ function openJob(id) {
 
   // Fields
   document.getElementById('f-name').value = currentJob.customer_name || '';
-  document.getElementById('f-phone').value = currentJob.customer_phone || '';
+  document.getElementById('f-phone').value = formatPhone(currentJob.customer_phone || '');
   document.getElementById('f-email').value = currentJob.customer_email || '';
   document.getElementById('f-size').value = currentJob.shed_size || '';
   document.getElementById('f-type').value = currentJob.shed_type || '';
@@ -1498,7 +1498,7 @@ function showNewJobModal() {
   const name = prompt('Customer name:');
   if (!name) return;
   const phone = prompt('Phone number:');
-  createNewJob({ customer_name: name, customer_phone: phone || '', status: 'New' });
+  createNewJob({ customer_name: name, customer_phone: formatPhone(phone || ''), status: 'New' });
 }
 
 async function createNewJob(data) {
@@ -1549,6 +1549,27 @@ function formatDateTime(d) {
     allJobs = [];
   }
   renderDashboard();
+
+  // ===== PHONE FORMATTING =====
+  function formatPhone(val) {
+    const d = String(val).replace(/\D/g, '').slice(0, 10);
+    if (d.length === 0) return '';
+    if (d.length <= 3) return '(' + d;
+    if (d.length <= 6) return '(' + d.slice(0, 3) + ') ' + d.slice(3);
+    return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+  }
+
+  function attachPhoneFormat(input) {
+    input.addEventListener('input', function () {
+      const start = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = formatPhone(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(start + diff, start + diff);
+    });
+  }
+
+  attachPhoneFormat(document.getElementById('f-phone'));
 
   // ===== ADDRESS AUTOCOMPLETE =====
   function attachAddressAutocomplete(input) {
