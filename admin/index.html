@@ -713,6 +713,202 @@
     .modal h3 { color: var(--navy); margin-bottom: 0.75rem; }
     .modal p { color: var(--gray-600); font-size: 0.95rem; margin-bottom: 1.25rem; }
     .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+    /* ===== DAILY ROUTES ===== */
+    .dr-header { margin-bottom: 1rem; }
+    .dr-date-row {
+      display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    }
+    .dr-depot-row {
+      display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem;
+    }
+    .dr-depot-label { font-family: 'Oswald', sans-serif; font-weight: 600; color: var(--navy); font-size: 0.95rem; white-space: nowrap; }
+    #dr-depot-select {
+      flex: 1; min-width: 200px; max-width: 420px;
+      padding: 0.5rem 0.75rem; border: 1.5px solid var(--gray-200); border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem;
+      background: var(--white); outline: none; cursor: pointer;
+    }
+    #dr-depot-select:focus { border-color: var(--blue); }
+    .dr-gear-btn {
+      background: none; border: 1.5px solid var(--gray-200); border-radius: 6px;
+      padding: 0.42rem 0.6rem; cursor: pointer; font-size: 0.95rem; color: var(--gray-600);
+      transition: all 0.2s; line-height: 1;
+    }
+    .dr-gear-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .dr-info-bar {
+      margin-top: 0.55rem; background: #e3f2fd; border: 1px solid #90caf9;
+      border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.87rem;
+      color: #1565c0; font-weight: 500;
+    }
+    .dr-add-loc-form {
+      margin-top: 0.55rem; background: var(--gray-50); border: 1px solid var(--gray-200);
+      border-radius: 8px; padding: 0.85rem; max-width: 460px;
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+    .dr-add-loc-form label { font-size: 0.82rem; font-weight: 600; color: var(--navy); }
+    .dr-add-loc-input-wrap { position: relative; }
+    .dr-add-loc-input-wrap input {
+      width: 100%; padding: 0.5rem 0.75rem; border: 1.5px solid var(--gray-200);
+      border-radius: 6px; font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; outline: none;
+    }
+    .dr-add-loc-input-wrap input:focus { border-color: var(--blue); }
+    .dr-add-loc-btns { display: flex; gap: 0.5rem; }
+    .dr-settings-panel {
+      margin-top: 0.55rem; background: var(--white); border: 1px solid var(--gray-200);
+      border-radius: 8px; padding: 0.85rem; max-width: 460px;
+    }
+    .dr-settings-panel h4 {
+      font-family: 'Oswald', sans-serif; font-size: 0.88rem; color: var(--navy);
+      margin-bottom: 0.6rem; font-weight: 600;
+    }
+    .dr-settings-loc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4rem 0; border-bottom: 1px solid var(--gray-100); font-size: 0.84rem;
+    }
+    .dr-settings-loc-row:last-child { border-bottom: none; }
+    .dr-settings-del-btn {
+      background: none; border: none; color: #dc3545; cursor: pointer;
+      font-size: 0.8rem; padding: 0.15rem 0.5rem; border-radius: 4px; flex-shrink: 0;
+    }
+    .dr-settings-del-btn:hover:not(:disabled) { background: #fff5f5; }
+    .dr-settings-del-btn:disabled { color: var(--gray-400); cursor: default; }
+    .dr-date-label { font-family: 'Oswald', sans-serif; font-weight: 600; color: var(--navy); font-size: 0.95rem; }
+    #dr-date {
+      padding: 0.5rem 0.75rem;
+      border: 1.5px solid var(--gray-200); border-radius: 6px;
+      font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; outline: none;
+    }
+    #dr-date:focus { border-color: var(--blue); }
+
+    .dr-layout {
+      display: grid; grid-template-columns: 360px 1fr; gap: 1.25rem; align-items: start;
+    }
+
+    .dr-jobs-panel {
+      background: var(--white); border: 1px solid var(--gray-200);
+      border-radius: 10px; overflow: hidden;
+    }
+    .dr-jobs-header {
+      padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--gray-200);
+      font-family: 'Oswald', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .dr-jobs-header span:last-child { font-family: 'Source Sans 3',sans-serif; font-weight: 400; font-size: 0.8rem; color: var(--gray-600); }
+    .dr-geocode-msg { padding: 0.5rem 1.25rem; font-size: 0.8rem; color: var(--blue); min-height: 1.5rem; }
+    .dr-jobs-list { max-height: calc(100vh - 230px); overflow-y: auto; }
+    .dr-empty { padding: 2rem 1.25rem; text-align: center; color: var(--gray-600); font-size: 0.9rem; }
+
+    .dr-job-card {
+      display: flex; gap: 0.6rem; padding: 0.8rem 0.85rem;
+      border-bottom: 1px solid var(--gray-100); transition: background 0.15s; cursor: default;
+    }
+    .dr-job-card:last-child { border-bottom: none; }
+    .dr-job-card:hover { background: var(--gray-50); }
+    .dr-job-card.excl { opacity: 0.4; }
+    .dr-job-card.dragging { opacity: 0.35; }
+    .dr-job-card.drag-over { border-top: 2px solid var(--blue); }
+
+    .dr-drag-handle { color: var(--gray-400); cursor: grab; font-size: 1.15rem; user-select: none; flex-shrink: 0; padding-top: 2px; }
+    .dr-drag-handle:active { cursor: grabbing; }
+    .dr-job-check { flex-shrink: 0; margin-top: 3px; cursor: pointer; accent-color: var(--blue); width: 15px; height: 15px; }
+
+    .dr-job-body { flex: 1; min-width: 0; }
+    .dr-job-top { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem; }
+    .dr-job-num {
+      width: 20px; height: 20px; background: var(--navy); color: var(--white);
+      border-radius: 50%; font-size: 0.68rem; font-weight: 700; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+      font-family: 'Oswald', sans-serif;
+    }
+    .dr-job-name { font-weight: 600; color: var(--navy); font-size: 0.87rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dr-job-shed { font-size: 0.77rem; color: var(--gray-600); margin-bottom: 0.3rem; }
+    .dr-addr-row { font-size: 0.77rem; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.1rem; }
+    .dr-addr-tag { display: inline-block; font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--gray-500); width: 36px; }
+    .dr-leg-info { font-size: 0.75rem; color: var(--blue); font-weight: 600; margin-top: 0.3rem; }
+    .dr-job-btns { margin-top: 0.35rem; }
+
+    .dr-map-panel { position: sticky; top: calc(var(--header-height) + 1.5rem); }
+    .dr-summary-bar {
+      background: var(--white); border: 1px solid var(--gray-200); border-radius: 10px;
+      padding: 0.8rem 1.25rem; margin-bottom: 0.85rem;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .dr-summary-stat { font-size: 0.88rem; color: var(--gray-700); }
+    .dr-summary-stat strong { color: var(--navy); }
+    .dr-summary-actions { margin-left: auto; }
+    #dr-map {
+      height: calc(100vh - 280px); min-height: 420px;
+      border-radius: 10px; border: 1px solid var(--gray-200);
+      position: relative; z-index: 0;
+    }
+
+    /* ===== CUSTOMER DETAIL ===== */
+    #view-customer-detail { display: none; }
+    #view-customer-detail.active { display: block; }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .breadcrumb-link {
+      color: var(--blue);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .breadcrumb-link:hover { text-decoration: underline; }
+    .breadcrumb-sep { color: var(--gray-500); }
+    .breadcrumb-current { color: var(--text); font-weight: 600; }
+
+    .cust-detail-header {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+    .cust-detail-avatar {
+      width: 56px;
+      height: 56px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .cust-detail-info { flex: 1; }
+    .cust-detail-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.4rem;
+      color: var(--navy);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .cust-detail-contact {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      margin-bottom: 0.85rem;
+    }
+    .cust-detail-contact a { color: var(--blue); text-decoration: none; }
+    .cust-detail-contact a:hover { text-decoration: underline; }
+    .cust-detail-stats { display: flex; gap: 2rem; }
+    .cust-detail-stat { text-align: center; }
+    .cust-detail-stat strong { display: block; font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: var(--navy); }
+    .cust-detail-stat small { font-size: 0.78rem; color: var(--gray-600); }
+
     /* ===== ADDRESS AUTOCOMPLETE ===== */
     .ac-wrap { position: relative; }
     .ac-dropdown {
@@ -760,6 +956,9 @@
     </div>
     <div class="nav-item" onclick="showView('jobs')" data-view="jobs">
       <span class="nav-icon">📄</span> Jobs List
+    </div>
+    <div class="nav-item" onclick="showView('routes')" data-view="routes">
+      <span class="nav-icon">🗺️</span> Daily Routes
     </div>
     <div class="nav-item" onclick="showView('customers')" data-view="customers">
       <span class="nav-icon">👥</span> Customers
@@ -849,6 +1048,64 @@
         <input class="search-input" id="customers-search" placeholder="Search customers…" oninput="filterCustomers()">
       </div>
       <div class="customers-grid" id="customers-grid"></div>
+    </div>
+
+    <!-- DAILY ROUTES -->
+    <div id="view-routes" class="view">
+      <div class="dr-header">
+        <div class="dr-date-row">
+          <label class="dr-date-label">Route Date</label>
+          <input type="date" id="dr-date" onchange="loadRouteJobs()">
+          <button class="btn btn-primary" id="dr-optimize-btn" onclick="optimizeRoute()">🔀 Optimize Route</button>
+        </div>
+        <div class="dr-depot-row">
+          <label class="dr-depot-label">Depot</label>
+          <select id="dr-depot-select" onchange="onDepotChange()"></select>
+          <button class="dr-gear-btn" onclick="toggleDepotSettings()" title="Manage saved locations">⚙️</button>
+        </div>
+        <div class="dr-info-bar" id="dr-info-bar"></div>
+        <div class="dr-add-loc-form" id="dr-add-loc-form" style="display:none;">
+          <label>New depot address (NY only)</label>
+          <div class="dr-add-loc-input-wrap">
+            <input type="text" id="dr-new-loc-input" placeholder="123 Main St, Buffalo, NY 14201" autocomplete="off">
+          </div>
+          <div class="dr-add-loc-btns">
+            <button class="btn btn-primary btn-sm" onclick="saveNewDepotLocation()">Save Location</button>
+            <button class="btn btn-ghost btn-sm" onclick="cancelNewDepotLocation()">Cancel</button>
+          </div>
+        </div>
+        <div class="dr-settings-panel" id="dr-settings-panel" style="display:none;">
+          <h4>⚙️ Saved Locations</h4>
+          <div id="dr-settings-loc-list"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:0.6rem;" onclick="toggleDepotSettings()">Close</button>
+        </div>
+      </div>
+      <div class="dr-layout">
+        <div class="dr-jobs-panel">
+          <div class="dr-jobs-header">
+            <span>Scheduled Jobs</span>
+            <span id="dr-job-count"></span>
+          </div>
+          <div class="dr-geocode-msg" id="dr-geocode-msg"></div>
+          <div class="dr-jobs-list" id="dr-jobs-list"></div>
+        </div>
+        <div class="dr-map-panel">
+          <div class="dr-summary-bar">
+            <span class="dr-summary-stat">🚛 Stops: <strong id="dr-stat-stops">—</strong></span>
+            <span class="dr-summary-stat">📍 Distance: <strong id="dr-stat-dist">—</strong></span>
+            <span class="dr-summary-stat">⏱ Drive time: <strong id="dr-stat-time">—</strong></span>
+            <div class="dr-summary-actions">
+              <button class="btn btn-ghost btn-sm" onclick="openFullRouteGoogleMaps()">🗺️ Full Route in Google Maps</button>
+            </div>
+          </div>
+          <div id="dr-map"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER DETAIL -->
+    <div id="view-customer-detail" class="view">
+      <div id="customer-detail-content"></div>
     </div>
 
     <!-- JOB DETAIL -->
@@ -1023,6 +1280,7 @@ let sortKey = 'created_at';
 let sortDir = -1;
 let map = null;
 let mapInitialized = false;
+let currentCustomerKey = null;
 
 // ===== API =====
 async function apiFetch(path, opts = {}) {
@@ -1089,7 +1347,7 @@ function showView(name) {
   const navEl = document.querySelector(`[data-view="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  const titles = { dashboard: 'Dashboard', kanban: 'Job Board', jobs: 'Jobs List', customers: 'Customers', detail: 'Job Detail' };
+  const titles = { dashboard: 'Dashboard', kanban: 'Job Board', jobs: 'Jobs List', routes: 'Daily Routes', customers: 'Customers', detail: 'Job Detail', 'customer-detail': 'Customer' };
   document.getElementById('topbar-title').textContent = titles[name] || name;
 
   renderCurrentView();
@@ -1100,7 +1358,9 @@ function renderCurrentView() {
     case 'dashboard': renderDashboard(); break;
     case 'kanban': renderKanban(); break;
     case 'jobs': renderJobsTable(); break;
+    case 'routes': renderRoutes(); break;
     case 'customers': renderCustomers(); break;
+    case 'customer-detail': if (currentCustomerKey) renderCustomerDetail(currentCustomerKey); break;
   }
 }
 
@@ -1258,7 +1518,7 @@ function renderCustomers() {
   allJobs.forEach(j => {
     const key = (j.customer_email || j.customer_phone || j.customer_name || '').toLowerCase();
     if (!key) return;
-    if (!map[key]) map[key] = { name: j.customer_name, email: j.customer_email, phone: j.customer_phone, jobs: [] };
+    if (!map[key]) map[key] = { key: key, name: j.customer_name, email: j.customer_email, phone: j.customer_phone, jobs: [] };
     map[key].jobs.push(j);
   });
 
@@ -1273,7 +1533,7 @@ function renderCustomers() {
     const revenue = c.jobs.filter(j => j.status === 'Completed' && j.quote_amount).reduce((s, j) => s + parseFloat(j.quote_amount), 0);
     const initials = (c.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     return `
-      <div class="customer-card">
+      <div class="customer-card" onclick="openCustomer(this.dataset.ckey)" data-ckey="${esc(c.key)}">
         <div class="customer-avatar">${initials}</div>
         <div class="customer-name">${esc(c.name || '—')}</div>
         <div class="customer-contact">${c.phone ? '📞 ' + esc(c.phone) : ''} ${c.email ? '· ' + esc(c.email) : ''}</div>
@@ -1287,6 +1547,109 @@ function renderCustomers() {
 }
 
 function filterCustomers() { renderCustomers(); }
+
+// ===== CUSTOMER DETAIL =====
+function openCustomer(key) {
+  currentCustomerKey = key;
+  renderCustomerDetail(key);
+  showView('customer-detail');
+  // Override topbar title with customer name
+  const cmap = {};
+  allJobs.forEach(j => {
+    const k = (j.customer_email || j.customer_phone || j.customer_name || '').toLowerCase();
+    if (k && !cmap[k]) cmap[k] = j.customer_name;
+  });
+  document.getElementById('topbar-title').textContent = cmap[key] || 'Customer';
+}
+
+function renderCustomerDetail(key) {
+  // Rebuild customer object from allJobs
+  const cmap = {};
+  allJobs.forEach(j => {
+    const k = (j.customer_email || j.customer_phone || j.customer_name || '').toLowerCase();
+    if (!k) return;
+    if (!cmap[k]) cmap[k] = { key: k, name: j.customer_name, email: j.customer_email, phone: j.customer_phone, jobs: [] };
+    cmap[k].jobs.push(j);
+  });
+
+  const c = cmap[key];
+  if (!c) return;
+
+  const jobs = [...c.jobs].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const totalValue = c.jobs.filter(j => j.quote_amount).reduce((s, j) => s + parseFloat(j.quote_amount), 0);
+  const initials = (c.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+  const jobRows = jobs.length ? `
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Shed Size</th>
+            <th>Pickup Address</th>
+            <th>Delivery Address</th>
+            <th>Quote</th>
+            <th>Scheduled</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${jobs.map(j => `
+            <tr onclick="openJob('${j.id}')">
+              <td><span class="badge badge-${(j.status || 'new').toLowerCase()}">${j.status || '—'}</span></td>
+              <td>${esc(j.shed_size || '—')}</td>
+              <td class="td-muted" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(j.pickup_address || '—')}</td>
+              <td class="td-muted" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(j.delivery_address || '—')}</td>
+              <td>${j.quote_amount ? '$' + parseFloat(j.quote_amount).toFixed(0) : '—'}</td>
+              <td class="td-muted">${formatDate(j.scheduled_date)}</td>
+              <td class="td-muted">${formatDate(j.created_at)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>` : `
+    <div class="card-body">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No jobs found for this customer</h3>
+      </div>
+    </div>`;
+
+  document.getElementById('customer-detail-content').innerHTML = `
+    <div class="breadcrumb">
+      <span class="breadcrumb-link" onclick="showView('customers')">Customers</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">${esc(c.name || '—')}</span>
+    </div>
+
+    <div class="cust-detail-header">
+      <div class="cust-detail-avatar">${initials}</div>
+      <div class="cust-detail-info">
+        <div class="cust-detail-name">${esc(c.name || '—')}</div>
+        <div class="cust-detail-contact">
+          ${c.phone ? `<span>📞 <a href="tel:${esc(c.phone)}">${esc(formatPhone(c.phone))}</a></span>` : ''}
+          ${c.email ? `<span>✉️ <a href="mailto:${esc(c.email)}">${esc(c.email)}</a></span>` : ''}
+        </div>
+        <div class="cust-detail-stats">
+          <div class="cust-detail-stat">
+            <strong>${c.jobs.length}</strong>
+            <small>Total Jobs</small>
+          </div>
+          ${totalValue > 0 ? `
+          <div class="cust-detail-stat">
+            <strong>$${totalValue.toFixed(0)}</strong>
+            <small>Total Value</small>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>Jobs</h3></div>
+      ${jobRows}
+    </div>
+  `;
+}
 
 // ===== JOB DETAIL =====
 function openJob(id) {
@@ -1538,6 +1901,492 @@ function formatDate(d) {
 function formatDateTime(d) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ===== DAILY ROUTES =====
+let drDate = '';
+let drJobs = [];
+let drOrder = [];
+let drExcluded = new Set();
+let drLegData = {};
+let drMap = null;
+let drMapInited = false;
+let drMarkers = [];
+let drPolyline = null;
+let drInited = false;
+let drDragSrc = null;
+const geocodeCache = {};
+const DR_DEFAULT_LOCATIONS = ['32 Woodstock Ln, Brockport, NY 14420'];
+let drLocations = [];
+let drDepot = '';
+let drNewLocInputAttached = false;
+
+function renderRoutes() {
+  const dp = document.getElementById('dr-date');
+  if (dp && !dp.value) dp.value = new Date().toISOString().split('T')[0];
+  if (!drInited) {
+    drInited = true;
+    initDepot();
+    setTimeout(() => { initDrMap(); loadRouteJobs(); }, 60);
+  } else {
+    if (drMapInited) setTimeout(() => drMap.invalidateSize(), 60);
+    renderRouteJobsList();
+  }
+}
+
+function initDrMap() {
+  if (drMapInited) return;
+  drMap = L.map('dr-map').setView([43.0, -78.5], 9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(drMap);
+  drMapInited = true;
+}
+
+function loadRouteJobs() {
+  drDate = document.getElementById('dr-date')?.value || drDate;
+  const enroute = allJobs.filter(j => j.status === 'Enroute');
+  const scheduled = allJobs.filter(j => j.scheduled_date === drDate && j.status !== 'Enroute');
+  const seen = new Set();
+  drJobs = [...enroute, ...scheduled].filter(j => {
+    if (seen.has(j.id)) return false;
+    seen.add(j.id);
+    return true;
+  });
+  drOrder = drJobs.map(j => j.id);
+  drExcluded = new Set();
+  drLegData = {};
+  clearDrMap();
+  renderRouteJobsList();
+  if (drJobs.length) geocodeAndDraw();
+}
+
+function clearDrMap() {
+  if (!drMap) return;
+  drMarkers.forEach(m => m.remove());
+  drMarkers = [];
+  if (drPolyline) { drPolyline.remove(); drPolyline = null; }
+  ['dr-stat-stops','dr-stat-dist','dr-stat-time'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '—';
+  });
+}
+
+function renderRouteJobsList() {
+  const list = document.getElementById('dr-jobs-list');
+  if (!list) return;
+  const ordered = drOrder.map(id => drJobs.find(j => j.id === id)).filter(Boolean);
+  const countEl = document.getElementById('dr-job-count');
+  if (!ordered.length) {
+    list.innerHTML = '<div class="dr-empty">No jobs scheduled for this date.</div>';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  const inclCount = ordered.filter(j => !drExcluded.has(j.id)).length;
+  if (countEl) countEl.textContent = `${inclCount} of ${ordered.length} included`;
+  let visNum = 0;
+  list.innerHTML = ordered.map((j, idx) => {
+    const excl = drExcluded.has(j.id);
+    if (!excl) visNum++;
+    const num = excl ? '' : visNum;
+    const leg = drLegData[j.id];
+    const mapsUrl = j.pickup_address && j.delivery_address
+      ? `https://www.google.com/maps/dir/${encodeURIComponent(j.pickup_address)}/${encodeURIComponent(j.delivery_address)}`
+      : '';
+    return `<div class="dr-job-card${excl ? ' excl' : ''}" data-id="${j.id}" data-idx="${idx}"
+        draggable="true"
+        ondragstart="drDragStart(event)" ondragover="drDragOver(event)"
+        ondrop="drDrop(event)" ondragend="drDragEnd(event)">
+      <div class="dr-drag-handle" title="Drag to reorder">⠿</div>
+      <input type="checkbox" class="dr-job-check" ${excl ? '' : 'checked'}
+        onchange="toggleDrExclude('${j.id}',this.checked)">
+      <div class="dr-job-body">
+        <div class="dr-job-top">
+          ${num ? `<div class="dr-job-num">${num}</div>` : ''}
+          <div class="dr-job-name">${esc(j.customer_name || '—')}</div>
+          <span class="badge badge-${(j.status||'new').toLowerCase()}">${j.status||'—'}</span>
+        </div>
+        <div class="dr-job-shed">${[j.shed_size,j.shed_type].filter(Boolean).join(' · ') || '—'}</div>
+        <div class="dr-addr-row"><span class="dr-addr-tag">Pickup</span>${esc(j.pickup_address||'—')}</div>
+        <div class="dr-addr-row"><span class="dr-addr-tag">Drop</span>${esc(j.delivery_address||'—')}</div>
+        ${leg ? `<div class="dr-leg-info">📏 ${leg.dist} &nbsp;⏱ ${leg.time}</div>` : ''}
+        <div class="dr-job-btns">
+          ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" class="btn btn-ghost btn-sm">🗺 Directions</a>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function drDragStart(e) {
+  drDragSrc = e.currentTarget;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', e.currentTarget.dataset.idx);
+}
+function drDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.dr-job-card').forEach(c => c.classList.remove('drag-over'));
+  if (e.currentTarget !== drDragSrc) e.currentTarget.classList.add('drag-over');
+}
+function drDrop(e) {
+  e.preventDefault();
+  document.querySelectorAll('.dr-job-card').forEach(c => c.classList.remove('drag-over'));
+  const from = parseInt(drDragSrc?.dataset.idx ?? -1);
+  const to = parseInt(e.currentTarget.dataset.idx ?? -1);
+  if (from < 0 || to < 0 || from === to) return;
+  const moved = drOrder.splice(from, 1)[0];
+  drOrder.splice(to, 0, moved);
+  drLegData = {};
+  renderRouteJobsList();
+  buildDrRoute();
+}
+function drDragEnd() {
+  document.querySelectorAll('.dr-job-card').forEach(c => c.classList.remove('dragging','drag-over'));
+}
+
+function toggleDrExclude(id, checked) {
+  if (checked) drExcluded.delete(id); else drExcluded.add(id);
+  drLegData = {};
+  renderRouteJobsList();
+  buildDrRoute();
+}
+
+async function geocodeAddr(address) {
+  if (!address) return null;
+  const key = address.trim().toLowerCase();
+  if (geocodeCache[key]) return geocodeCache[key];
+  try {
+    const coords = await geocode(address);
+    geocodeCache[key] = coords;
+    return coords;
+  } catch(e) { return null; }
+}
+
+async function geocodeAndDraw() {
+  const allAddrs = [];
+  if (drDepot) allAddrs.push(drDepot);
+  drJobs.forEach(j => {
+    if (j.pickup_address) allAddrs.push(j.pickup_address);
+    if (j.delivery_address) allAddrs.push(j.delivery_address);
+  });
+  const uncached = [...new Set(allAddrs)].filter(a => !geocodeCache[a.trim().toLowerCase()]);
+  const msgEl = document.getElementById('dr-geocode-msg');
+  if (uncached.length > 0) {
+    for (let i = 0; i < uncached.length; i++) {
+      if (msgEl) msgEl.textContent = `Geocoding addresses… ${i + 1} of ${uncached.length}`;
+      await geocodeAddr(uncached[i]);
+      if (i < uncached.length - 1) await new Promise(r => setTimeout(r, 300));
+    }
+  }
+  if (msgEl) msgEl.textContent = '';
+  await buildDrRoute();
+}
+
+async function buildDrRoute() {
+  if (!drMap) return;
+  clearDrMap();
+  const depotCoord = drDepot ? await geocodeAddr(drDepot) : null;
+  const inclIds = drOrder.filter(id => !drExcluded.has(id));
+  const jobs = inclIds.map(id => drJobs.find(j => j.id === id)).filter(Boolean);
+  if (!jobs.length) { renderRouteJobsList(); return; }
+
+  // stops[] = [depot?, pickup1, delivery1, pickup2, delivery2, ...]
+  const stops = [];
+  const jobStopIdx = {};
+  if (depotCoord) stops.push({ coord: depotCoord, isDepot: true, addr: drDepot });
+  for (let i = 0; i < jobs.length; i++) {
+    const j = jobs[i];
+    const pCoord = await geocodeAddr(j.pickup_address);
+    const dCoord = await geocodeAddr(j.delivery_address);
+    jobStopIdx[j.id] = { pIdx: null, dIdx: null };
+    if (pCoord) { jobStopIdx[j.id].pIdx = stops.length; stops.push({ coord: pCoord, label: String(i+1), green: true, addr: j.pickup_address }); }
+    if (dCoord) { jobStopIdx[j.id].dIdx = stops.length; stops.push({ coord: dCoord, label: String(i+1), green: false, addr: j.delivery_address }); }
+  }
+  if (stops.length < 2) { renderRouteJobsList(); return; }
+
+  // Plot markers
+  stops.forEach(s => {
+    let icon;
+    if (s.isDepot) {
+      icon = L.divIcon({
+        html: `<div style="background:#0b1f3a;width:28px;height:28px;border-radius:6px;border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;">🏠</div>`,
+        iconSize:[28,28], iconAnchor:[14,14], className:''
+      });
+    } else {
+      const col = s.green ? '#2e7d32' : '#c62828';
+      icon = L.divIcon({
+        html: `<div style="background:${col};width:26px;height:26px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;font-family:Oswald,sans-serif;">${s.label}</div>`,
+        iconSize:[26,26], iconAnchor:[13,13], className:''
+      });
+    }
+    drMarkers.push(L.marker(s.coord, { icon }).addTo(drMap)
+      .bindPopup(`${s.isDepot ? '🏠 Depot' : s.green ? '🟢 Pickup' : '🔴 Delivery'}${s.label ? ' #'+s.label : ''}<br>${esc(s.addr||'')}`));
+  });
+  drMap.fitBounds(stops.map(s => s.coord), { padding: [40,40] });
+
+  // OSRM route — append depot at end so truck returns to base
+  const osrmCoords = depotCoord
+    ? [...stops.map(s => s.coord), depotCoord]
+    : stops.map(s => s.coord);
+
+  if (osrmCoords.length >= 2) {
+    const coordStr = osrmCoords.map(c => `${c[1]},${c[0]}`).join(';');
+    try {
+      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`);
+      const data = await res.json();
+      if (data.code === 'Ok' && data.routes[0]) {
+        const route = data.routes[0];
+        drPolyline = L.geoJSON(route.geometry, { style: { color:'#1a4f8a', weight:4, opacity:0.8 } }).addTo(drMap);
+        const totalMi = (route.distance * 0.000621371).toFixed(1);
+        const totalSec = route.duration;
+        const hrs = Math.floor(totalSec / 3600);
+        const mins = Math.round((totalSec % 3600) / 60);
+        document.getElementById('dr-stat-stops').textContent = jobs.length;
+        document.getElementById('dr-stat-dist').textContent = totalMi + ' mi';
+        document.getElementById('dr-stat-time').textContent = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+        // Per-job leg: legs[pIdx] is the pickup→delivery leg (works because depot at 0 shifts all indices correctly)
+        if (route.legs) {
+          jobs.forEach(j => {
+            const si = jobStopIdx[j.id];
+            if (si.pIdx !== null && si.dIdx !== null && si.dIdx === si.pIdx + 1) {
+              const leg = route.legs[si.pIdx];
+              if (leg) {
+                const lm = (leg.distance * 0.000621371).toFixed(1);
+                const lt = Math.round(leg.duration / 60);
+                drLegData[j.id] = { dist: lm + ' mi', time: lt >= 60 ? `${Math.floor(lt/60)}h ${lt%60}m` : `${lt}m` };
+              }
+            }
+          });
+        }
+      }
+    } catch(e) { console.warn('DR route error:', e); }
+  }
+  renderRouteJobsList();
+}
+
+async function optimizeRoute() {
+  const btn = document.getElementById('dr-optimize-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Optimizing…'; }
+  try {
+    const inclIds = drOrder.filter(id => !drExcluded.has(id));
+    const jobs = inclIds.map(id => drJobs.find(j => j.id === id)).filter(Boolean);
+    const jobCoords = [];
+    for (const j of jobs) {
+      const c = await geocodeAddr(j.pickup_address);
+      if (c) jobCoords.push({ id: j.id, coord: c });
+    }
+    if (jobCoords.length < 2) { toast('Need at least 2 geocoded jobs to optimize', 'error'); return; }
+    const depotCoord = drDepot ? await geocodeAddr(drDepot) : null;
+    // Prepend depot as fixed start so OSRM optimizes from there
+    const tripPoints = depotCoord
+      ? [depotCoord, ...jobCoords.map(jc => jc.coord)]
+      : jobCoords.map(jc => jc.coord);
+    const coordStr = tripPoints.map(c => `${c[1]},${c[0]}`).join(';');
+    const res = await fetch(`https://router.project-osrm.org/trip/v1/driving/${coordStr}?overview=false&roundtrip=false&source=first&destination=last`);
+    const data = await res.json();
+    if (data.code === 'Ok' && data.waypoints) {
+      const offset = depotCoord ? 1 : 0; // skip depot waypoint[0] when reordering jobs
+      const reordered = jobCoords
+        .map((jc, i) => ({ id: jc.id, tripIdx: data.waypoints[i + offset].waypoint_index }))
+        .sort((a, b) => a.tripIdx - b.tripIdx)
+        .map(x => x.id);
+      const notOpt = inclIds.filter(id => !jobCoords.find(jc => jc.id === id));
+      const excl = drOrder.filter(id => drExcluded.has(id));
+      drOrder = [...reordered, ...notOpt, ...excl];
+      drLegData = {};
+      toast('Route optimized! 🎉', 'success');
+      await buildDrRoute();
+    } else {
+      toast('Optimization failed', 'error');
+    }
+  } catch(e) { toast('Optimization error: ' + e.message, 'error'); }
+  if (btn) { btn.disabled = false; btn.textContent = '🔀 Optimize Route'; }
+}
+
+function openFullRouteGoogleMaps() {
+  const jobs = drOrder.filter(id => !drExcluded.has(id))
+    .map(id => drJobs.find(j => j.id === id)).filter(Boolean);
+  const addrs = [];
+  if (drDepot) addrs.push(drDepot);
+  jobs.forEach(j => {
+    if (j.pickup_address) addrs.push(j.pickup_address);
+    if (j.delivery_address) addrs.push(j.delivery_address);
+  });
+  if (drDepot) addrs.push(drDepot);
+  if (addrs.length < 2) { toast('Not enough addresses for directions', 'error'); return; }
+  const origin = encodeURIComponent(addrs[0]);
+  const dest = encodeURIComponent(addrs[addrs.length - 1]);
+  const wps = addrs.slice(1, -1).map(encodeURIComponent).join('|');
+  window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}${wps ? '&waypoints=' + wps : ''}`, '_blank');
+}
+
+// ===== DEPOT MANAGEMENT =====
+function initDepot() {
+  const stored = localStorage.getItem('dr_locations');
+  drLocations = stored ? JSON.parse(stored) : [...DR_DEFAULT_LOCATIONS];
+  if (!drLocations.length) drLocations = [...DR_DEFAULT_LOCATIONS];
+  const last = localStorage.getItem('dr_last_depot');
+  drDepot = (last && drLocations.includes(last)) ? last : drLocations[0];
+  populateDepotDropdown();
+  updateDepotInfoBar();
+}
+
+function populateDepotDropdown() {
+  const sel = document.getElementById('dr-depot-select');
+  if (!sel) return;
+  sel.innerHTML = drLocations.map(loc =>
+    `<option value="${esc(loc)}"${loc === drDepot ? ' selected' : ''}>${esc(loc)}</option>`
+  ).join('') +
+  `<option disabled>──────────────</option>` +
+  `<option value="__add__">+ Add New Location</option>`;
+}
+
+function updateDepotInfoBar() {
+  const bar = document.getElementById('dr-info-bar');
+  if (bar) bar.textContent = `📍 Departing from: ${drDepot}`;
+}
+
+function onDepotChange() {
+  const sel = document.getElementById('dr-depot-select');
+  if (!sel) return;
+  if (sel.value === '__add__') {
+    sel.value = drDepot; // revert selection visually
+    const form = document.getElementById('dr-add-loc-form');
+    if (form) form.style.display = 'block';
+    const input = document.getElementById('dr-new-loc-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+      if (!drNewLocInputAttached) {
+        drNewLocInputAttached = true;
+        attachDrDepotAutocomplete(input);
+      }
+    }
+    return;
+  }
+  drDepot = sel.value;
+  localStorage.setItem('dr_last_depot', drDepot);
+  updateDepotInfoBar();
+  if (drJobs.length && drMapInited) { drLegData = {}; geocodeAndDraw(); }
+}
+
+function saveNewDepotLocation() {
+  const input = document.getElementById('dr-new-loc-input');
+  const addr = input?.value.trim();
+  if (!addr) { toast('Please enter an address', 'error'); return; }
+  if (!drLocations.includes(addr)) {
+    drLocations.push(addr);
+    saveDrLocationsToStorage();
+  }
+  drDepot = addr;
+  localStorage.setItem('dr_last_depot', drDepot);
+  populateDepotDropdown();
+  updateDepotInfoBar();
+  cancelNewDepotLocation();
+  if (drJobs.length && drMapInited) { drLegData = {}; geocodeAndDraw(); }
+  toast('Location saved', 'success');
+}
+
+function cancelNewDepotLocation() {
+  const form = document.getElementById('dr-add-loc-form');
+  if (form) form.style.display = 'none';
+  const input = document.getElementById('dr-new-loc-input');
+  if (input) input.value = '';
+}
+
+function toggleDepotSettings() {
+  const panel = document.getElementById('dr-settings-panel');
+  if (!panel) return;
+  if (panel.style.display === 'none') {
+    renderDepotSettingsList();
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function renderDepotSettingsList() {
+  const list = document.getElementById('dr-settings-loc-list');
+  if (!list) return;
+  list.innerHTML = drLocations.map((loc, i) => `
+    <div class="dr-settings-loc-row">
+      <span>${esc(loc)}</span>
+      <button class="dr-settings-del-btn" onclick="deleteDepotLocation(${i})"
+        ${drLocations.length <= 1 ? 'disabled title="Cannot delete the last location"' : ''}>🗑 Delete</button>
+    </div>`).join('');
+}
+
+function deleteDepotLocation(idx) {
+  if (drLocations.length <= 1) return;
+  const removed = drLocations.splice(idx, 1)[0];
+  saveDrLocationsToStorage();
+  if (drDepot === removed) {
+    drDepot = drLocations[0];
+    localStorage.setItem('dr_last_depot', drDepot);
+    updateDepotInfoBar();
+    if (drJobs.length && drMapInited) { drLegData = {}; geocodeAndDraw(); }
+  }
+  populateDepotDropdown();
+  renderDepotSettingsList();
+  toast('Location removed', 'success');
+}
+
+function saveDrLocationsToStorage() {
+  localStorage.setItem('dr_locations', JSON.stringify(drLocations));
+}
+
+// Autocomplete for the depot "Add New Location" input
+function attachDrDepotAutocomplete(input) {
+  const wrap = document.createElement('div');
+  wrap.className = 'ac-wrap';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const dropdown = document.createElement('ul');
+  dropdown.className = 'ac-dropdown';
+  dropdown.style.display = 'none';
+  wrap.appendChild(dropdown);
+  let timer = null;
+  input.addEventListener('input', function() {
+    clearTimeout(timer);
+    const val = this.value.trim();
+    if (val.length < 3) { dropdown.style.display = 'none'; return; }
+    timer = setTimeout(() => drDepotFetchSuggestions(val, input, dropdown), 150);
+  });
+  input.addEventListener('blur', function() {
+    setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+  });
+}
+
+async function drDepotFetchSuggestions(query, input, dropdown) {
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=us&addressdetails=1&namedetails=0&q=' + encodeURIComponent(query);
+    const res = await fetch(url, { headers: { 'User-Agent': 'WNYShedMovers/1.0' } });
+    const data = await res.json();
+    const results = data.filter(item => {
+      const a = item.address || {};
+      return a.state === 'New York' && a.house_number;
+    }).map(item => {
+      const a = item.address;
+      const rawCity = a.city || a.town || a.village || a.hamlet || a.suburb || '';
+      const city = rawCity.replace(/^(village|town|city|hamlet)\s+of\s+/i, '');
+      return a.house_number + ' ' + (a.road || '') + ', ' + city + ', NY ' + (a.postcode || '');
+    });
+    if (!results.length) { dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = '';
+    results.forEach(label => {
+      const li = document.createElement('li');
+      li.textContent = label;
+      li.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        input.value = label;
+        dropdown.style.display = 'none';
+      });
+      dropdown.appendChild(li);
+    });
+    dropdown.style.display = 'block';
+  } catch(e) { dropdown.style.display = 'none'; }
 }
 
 // ===== PHONE FORMATTING =====
